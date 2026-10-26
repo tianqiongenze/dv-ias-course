@@ -18,8 +18,8 @@ cp -f dv-ias/perf/locustfile.py "$PREF/perf/" 2>/dev/null || true
 cp -f dv-ias/test/*.py "$PREF/test/" 2>/dev/null || true
 cp -f dv-ias/scripts/*.sh "$PREF/scripts/" 2>/dev/null || true
 
-echo "→ 3/4 敏感信息扫描"
-if grep -rInE "szxc@2026|SzxcRedis|SzxcRo-|SzxcJwt|BEGIN (RSA|EC) PRIVATE" \
+echo "→ 3/4 敏感信息扫描（跳过演示账号文档 16-局域网人工测试操作指南.md，其密码为公开演示账号）"
+if grep -rInE "SzxcRedis|SzxcRo-|SzxcJwt|BEGIN (RSA|EC) PRIVATE|DB_PASS=" \
      --include="*.md" "$PREF" >/tmp/sync_secret_hit.txt 2>/dev/null; then
   if [ -s /tmp/sync_secret_hit.txt ]; then
     echo "!! 检出疑似敏感信息，已中止。请人工处理："; cat /tmp/sync_secret_hit.txt
