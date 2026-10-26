@@ -1,0 +1,19 @@
+name: build-docs
+on: [push, workflow_dispatch]
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pandoc/actions@v1
+      - name: Convert md → docx & pdf
+        run: |
+          mkdir -p word pdf
+          find docs worksheets assessments -name "*.md" | while read f; do
+            base=$(echo "$f" | sed 's#.*/##; s#\.md$##')
+            dir=$(dirname "$f")
+            pandoc "$f" -o "word/${base}.docx" --metadata title="$base" || true
+            pandoc "$f" -o "pdf/${base}.pdf" --pdf-engine=xelatex -V CJKmainfont="Noto Sans CJK SC" || true
+          done
+      - uses: actions/upload-artifact@v4
+        with: {name: teaching-docs, path: "[word pdf]"}
