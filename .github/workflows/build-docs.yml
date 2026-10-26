@@ -5,15 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pandoc/actions@v1
-      - name: Convert md → docx & pdf
+      - name: Install toolchain
         run: |
-          mkdir -p word pdf
-          find docs worksheets assessments -name "*.md" | while read f; do
-            base=$(echo "$f" | sed 's#.*/##; s#\.md$##')
-            dir=$(dirname "$f")
-            pandoc "$f" -o "word/${base}.docx" --metadata title="$base" || true
-            pandoc "$f" -o "pdf/${base}.pdf" --pdf-engine=xelatex -V CJKmainfont="Noto Sans CJK SC" || true
-          done
+          sudo apt-get update -qq && sudo apt-get install -y -qq pandoc
+          pip install --quiet xhtml2pdf markdown
+      - name: Convert md to docx and pdf
+        run: python build_docs.py
       - uses: actions/upload-artifact@v4
-        with: {name: teaching-docs, path: "[word pdf]"}
+        with:
+          name: teaching-docs
+          path: |
+            word
+            pdf
